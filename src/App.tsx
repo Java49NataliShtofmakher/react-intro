@@ -1,43 +1,32 @@
-import React from 'react';
-
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { Navigator } from './components/navigators/Navigator';
 import './App.css'
-import { CounterMultiply } from './components/CounterMultiply';
-import { CounterSquare } from './components/CounterSquare';
-import { CounterUpdater } from './components/CounterUpdater';
-import { Login } from './components/Login';
-import { Logout } from './components/Logout';
-import { useSelector } from 'react-redux';
-import { Input } from './components/Input';
+import { Products } from './components/navigators/Products';
+import { BreadProducts } from './components/pages/BreadProducts';
+import { Customers } from './components/pages/Customers';
+import { DairyProducts } from './components/pages/DairyProducts';
+import { Home } from './components/pages/Home';
+import { Orders } from './components/pages/Orders';
+import { layoutConfig } from './config/layout-config';
+import { productsConfig } from './config/products-config';
 
 function App() {
-  const auth: string = useSelector<any, string>(state => state.auth.authenticated);
-  const [operand, setOperand] = React.useState(1);
-  const [factor, setFactor] = React.useState(10);
-
-  return <div>
-    {auth && <div>
-      <p> Username: {auth}</p>
-      <Input placeHolder={'Enter operand'} inputProcess={function (value: string):
-        string {
-        setOperand(+value);
-        return '';
-      }}></Input>
-      <Input placeHolder={'Enter factor'} inputProcess={function (value: string):
-        string {
-        setFactor(+value);
-        return '';
-      }}></Input>
-    </div>}
-
-    {auth && <div>
-      <CounterUpdater operand={operand}></CounterUpdater>
-      <CounterSquare></CounterSquare>
-      <CounterMultiply factor={factor}></CounterMultiply>
-    </div>}
-
-    {auth && <Logout></Logout>}
-    {!auth && <Login></Login>}
-  </div>
+  return <BrowserRouter>
+      <Routes>
+          <Route path='/' element={<Navigator className={layoutConfig.className}
+           routes={layoutConfig.routes}  />}>
+              <Route index element={<Home/>}></Route>
+              <Route path='customers' element={<Customers/>}/>
+              <Route path='orders' element={<Orders/>}></Route>
+              <Route path='products' element={<Navigator
+               className={productsConfig.className} routes={productsConfig.routes}/>}>
+                    <Route path='dairy' element={<DairyProducts/>}/>
+                    <Route path='bread' element={<BreadProducts/>}/>
+              </Route>
+          </Route>
+              
+      </Routes>
+  </BrowserRouter>
 
 }
 export default App;
