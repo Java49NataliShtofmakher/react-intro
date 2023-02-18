@@ -40,7 +40,6 @@ export const Employees: React.FC = () => {
 
 
     const employees = useSelector<any, Employee[]>(state => state.employees.employees);
-    console.log('employees ->', employees);
 
     return <Box sx={{ height: "80vh", width: "80vw" }}>
         <DataGrid columns={columns.current} rows={employees} />
