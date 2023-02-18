@@ -6,7 +6,7 @@ export function getRandomNumber(min: number, max: number,
     if (isMaxInclusive) {
         max++;
     }
-    if (min == max) {
+    if (min === max) {
         throw "min may not be equaled to max";
     }
     if (min > max) {
@@ -17,10 +17,11 @@ export function getRandomNumber(min: number, max: number,
 }
 export function getElement<T>(array: T[]): T {
     return array[getRandomNumber(0, array.length)];
+
 }
 export function getRandomMatrix(rows: number, columns: number, min: number,
     max: number): number[][] {
-    const resMatrix: number[][] = [[]];
+    const resMatrix: number[][] = [];
     for (let i = 0; i < rows; i++) {
         resMatrix[i] = [];
         for (let j = 0; j < columns; j++) {
