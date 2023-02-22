@@ -1,24 +1,12 @@
 import React from 'react';
-import { Box, Typography } from "@mui/material";
-import { statAge } from '../../service/EmployeesService';
 import { useSelector } from 'react-redux';
 import { Employee } from '../../model/Employee';
-import { Statistics } from '../navigators/Statistics';
+import { Statistics } from '../Statistics';
 
 export const AgeStatistics: React.FC = () => {
-    const employees = useSelector<any, Employee[]>
-        (state => state.employees.employees)
-
-    const { minAge, maxAge, avgAge } = statAge(employees)
-
-    const newData = [{
-        id: 0,
-        minValue: minAge,
-        maxValue: maxAge,
-        avgValue: avgAge
-    }]
-
-    return <Box>
-        <Statistics title='Age Statistics' data={newData} />
-    </Box>
+    const employees: Employee[] = useSelector<any, Employee[]>(state => state.company.employees)
+    const employeesAge = employees.map(empl => ({
+        ...empl, age: new Date().getFullYear() - new Date(empl.birthDate).getFullYear()
+    }))
+    return <Statistics title="Age Statistics" field="age" objects={employeesAge} />
 }
