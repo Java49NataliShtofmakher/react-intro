@@ -1,7 +1,7 @@
+
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Navigator } from './components/navigators/Navigator';
 import './App.css'
-
 import { layoutConfig } from './config/layout-config';
 import { Employees } from './components/pages/Employees';
 import { AddEmployee } from './components/pages/AddEmployee';
@@ -13,6 +13,7 @@ import { RouteType } from './model/RouteType';
 import { useSelector } from 'react-redux';
 import { Login } from './components/pages/Login';
 import { Logout } from './components/pages/Logout';
+import { Generation } from './components/pages/Generation';
 
 
 function App() {
@@ -20,9 +21,12 @@ function App() {
     const authUser:string = useSelector<any,string>(state=>state.auth.authenticated );
     useEffect(()=> {
         function getRoutes(): RouteType[] {
+            const logoutRoute: RouteType |undefined = layoutConfig.routes
+            .find(r => r.path.includes('logout'))
+            logoutRoute!.label = authUser;
             return layoutConfig.routes.filter(r => (!authUser && !r.flAuth) ||
             (authUser.includes('admin') && r.flAdmin) ||
-            (!!authUser && r.flAuth && !r.flAdmin))
+            (authUser && r.flAuth && !r.flAdmin))
         }
         setRoutes(getRoutes());
     }, [authUser])
@@ -36,6 +40,7 @@ function App() {
               <Route path='statistics/salary' element={<SalaryStatistics/>}/>
               <Route path='login' element={<Login/>}/>
               <Route path='logout' element={<Logout/>}/>
+              <Route path='generation' element={<Generation/>}/>
               
           </Route>
               

@@ -1,10 +1,12 @@
 
 import React, { useEffect } from "react"
 import { Alert } from "./Alert";
+
 type InputProps = {
     placeHolder: string;
     inputProcess: (value: string) => string
 }
+
 export const Input: React.FC<InputProps> = ({ placeHolder, inputProcess }) => {
     let inputElement: HTMLInputElement | null
     const inputId =
