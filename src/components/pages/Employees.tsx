@@ -8,6 +8,7 @@ import { Delete, Edit, PersonAdd } from '@mui/icons-material';
 import './table.css'
 import { employeesActions } from '../../redux/employees-slice';
 import { EmployeeForm } from '../forms/EmployeeForm';
+import { Confirmation } from '../common/Confirmation';
 
 export const Employees: React.FC = () => {
     const dispatch = useDispatch();
@@ -34,8 +35,8 @@ export const Employees: React.FC = () => {
             field: 'actions', type: "actions", getActions: (params) => {
                 return authUser.includes('admin') ? [
                     <GridActionsCellItem label="remove" icon={<Delete />}
-                        onClick={() =>
-                            dispatch(employeesActions.removeEmployee(+params.id))} />,
+                        onClick={() => removeEmployee(+params.id)
+                        } />,
                     <GridActionsCellItem label="update" icon={<Edit />}
                         onClick={() => {
                             editId.current = +params.id;
@@ -49,32 +50,70 @@ export const Employees: React.FC = () => {
     ])
     const [flEdit, setFlEdit] = useState<boolean>(false);
     const [flAdd, setFlAdd] = useState<boolean>(false);
-    
+
+    const title = useRef<string>('');
+    const content = useRef<string>('');
+    const confirmFn = useRef<(isOk: boolean) => void>((isOk) => { });
+    const [open, setOpen] = useState<boolean>(false);
+
+    const idRemoved = useRef<number>(0);
+
+    const employeeToUpdate = useRef<Employee>();
+
+    function removeEmployee(id: number) {
+        title.current = 'Remove Employee ?';
+        const employee = employees.find(empl => empl.id == id);
+        content.current = `You are going to remove employee ${employee?.name}`;
+        idRemoved.current = id;
+        confirmFn.current = actualRemove
+        setOpen(true);
+    }
+
+    function actualRemove(isOk: boolean) {
+        if (isOk) {
+            dispatch(employeesActions.removeEmployee(idRemoved.current))
+        }
+        setOpen(false);
+    }
+    function actualUpdate(isOk: boolean) {
+        if (isOk) {
+            dispatch(employeesActions.updateEmployee(employeeToUpdate.current));
+        }
+        setOpen(true);
+    }
+
     const employees = useSelector<any, Employee[]>(state => state.company.employees);
     function getComponent(): ReactNode {
         let res: ReactNode = <Box sx={{ height: "70vh", width: "80vw" }}>
-                <DataGrid columns={columns.current} rows={employees}/>
-                {authUser.includes("admin") && <IconButton onClick={() => setFlAdd(true)}><PersonAdd/></IconButton>}
+            <DataGrid columns={columns.current} rows={employees} />
+            {authUser.includes("admin") && <IconButton onClick={() => setFlAdd(true)}><PersonAdd /></IconButton>}
         </Box>
         if (flEdit) {
             res = <EmployeeForm submitFn={function (empl: Employee): boolean {
-                dispatch(employeesActions.updateEmployee(empl));
+                title.current = 'Update Employee?'
+                content.current = `You are going to update employee ${empl.name}`
+                employeeToUpdate.current = empl;
+                confirmFn.current = actualUpdate;
+                setOpen(true);
+
                 setFlEdit(false);
                 return true;
-            } } employeeUpdate = {employees.find(empl => empl.id == editId.current)} />
+            }} employeeUpdate={employees.find(empl => empl.id == editId.current)} />
         } else if (flAdd) {
             res = <EmployeeForm submitFn={function (empl: Employee): boolean {
                 dispatch(employeesActions.addEmployee(empl));
                 setFlAdd(false);
                 return true;
-            } }/>
+            }} />
         }
         return res;
     }
     return <Box sx={{ height: "80vh", width: "80vw" }}>
         {getComponent()}
+        <Confirmation
+            title={title.current}
+            content={content.current}
+            confirmFn={confirmFn.current}
+            open={open}></Confirmation>
     </Box>
-}
-function getListItems(employees: Employee[]): React.ReactNode {
-    return employees.map((empl, index) => <ListItem key={index}><Typography>{JSON.stringify(empl)}</Typography></ListItem>)
 }
