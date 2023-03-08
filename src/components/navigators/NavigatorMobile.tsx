@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { Menu } from '@mui/icons-material'
@@ -26,7 +25,8 @@ export const NavigatorMobile: React.FC<NavigatorProps> = ({ routes }) => {
         setOpen(!flOpen);
     }
     function getListItems(): React.ReactNode {
-        return routes.map(i => <ListItem onClick={toggleOpen} component={Link} to={i.path} key={i.path}>{i.label}</ListItem>)
+        return routes.map(i => <ListItem onClick={toggleOpen} 
+            component={Link} to={i.path} key={i.path}>{i.label}</ListItem>)
     }
     return <Box sx={{ marginTop: { xs: "15vh", sm: "20vh" } }}>
         <AppBar position="fixed">
