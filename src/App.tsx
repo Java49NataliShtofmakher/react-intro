@@ -8,15 +8,16 @@ import { AddEmployee } from './components/pages/AddEmployee';
 import { AgeStatistics } from './components/pages/AgeStatistics';
 import { SalaryStatistics } from './components/pages/SalaryStatistics';
 import { useEffect, useState } from 'react';
-import { NavigatorProps } from './model/NavigatorProps';
 import { RouteType } from './model/RouteType';
 import { useDispatch, useSelector } from 'react-redux';
 import { Login } from './components/pages/Login';
 import { Logout } from './components/pages/Logout';
 import { Generation } from './components/pages/Generation';
-import { Grid, Paper } from '@mui/material';
 import { NavigatorDispatch } from './components/navigators/NavigatorDispatch';
-import { employeesActions } from './redux/employees-slice';
+import { company, setEmployees } from './redux/employees-slice';
+import { Employee } from './model/Employee';
+import { codeActions } from './redux/codeSlice';
+import { Subscription } from 'rxjs';
 
 
 function App() {
@@ -36,9 +37,21 @@ function App() {
     }, [authUser]);
 
     useEffect(() => {
-        if(authUser){
-            dispatch(employeesActions.getEmployees());
+        let subscription: Subscription;
+        if (authUser) {
+            subscription = company.getAllEmployees().subscribe({
+                next: (employees: Employee[]) => {
+                    dispatch(setEmployees(employees));
+                    dispatch(codeActions.setCode('OK'));
+                },
+                error: (err: any) => {
+                    dispatch(codeActions.setCode('Unknown Error'));
+                }
+            })
         }
+        return () => {
+            subscription.unsubscribe()
+        };
     }, [authUser])
 
     return <BrowserRouter>
